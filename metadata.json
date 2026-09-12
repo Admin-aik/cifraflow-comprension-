@@ -1,0 +1,8 @@
+{
+  "name": "CifraFlow",
+  "description": "Plataforma educativa para el desarrollo de la comprensión lectora, el pensamiento lógico-matemático, el cálculo aritmético estratégico y la resolución de problemas lógicos complejos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
