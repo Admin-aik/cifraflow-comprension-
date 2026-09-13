@@ -88,6 +88,8 @@ export interface CifraChallenge {
   financialLesson?: string;
   logicLesson?: string;
   bcvContext?: string;
+  bachilleratoYear?: string;
+  bachilleratoFocus?: string;
   gridCoordinates: [number, number, number];
 }
 

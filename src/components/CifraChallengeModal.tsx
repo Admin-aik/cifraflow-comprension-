@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { Sparkles, CheckCircle, AlertTriangle, ArrowRight, BookOpen, RotateCcw, HelpCircle } from 'lucide-react';
 import { CifraChallenge, CifraOption } from '../types';
 import { cyberAudio } from '../utils/audio';
-import { CifraFlowLogo } from './CifraFlowLogo';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface CifraChallengeModalProps {
   challenge: CifraChallenge;
@@ -13,6 +13,9 @@ interface CifraChallengeModalProps {
   onNextChallenge: () => void;
   onClose: () => void;
   onOpenGlossary: () => void;
+  onReturnToLevelSelector?: () => void;
+  onLogoClick?: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
@@ -21,7 +24,10 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
   onAnswerResolved,
   onNextChallenge,
   onClose,
-  onOpenGlossary
+  onOpenGlossary,
+  onReturnToLevelSelector,
+  onLogoClick,
+  onNavigateToSpace
 }) => {
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState<boolean>(false);
@@ -36,7 +42,7 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
 
   const complexity = challenge.complexity || (challenge.challengeIndexInModule <= 5 ? 'Principiante' : challenge.challengeIndexInModule <= 10 ? 'Intermedio' : 'Experto');
   const indexInTier = challenge.indexInComplexity || ((challenge.challengeIndexInModule - 1) % 5 + 1); // 1 to 5
-  const isTierLast = indexInTier === 5;
+  const isTierLast = indexInTier === 5; // 5th question of the level: strictly separate, NO auto-advance
 
   const tierMeta = {
     Principiante: {
@@ -45,7 +51,9 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
       dotPast: 'bg-emerald-950 border border-emerald-400/80 text-emerald-300',
       dotInactive: 'bg-slate-800 text-slate-500 border border-slate-700',
       label: 'PRINCIPIANTE',
-      range: 'Retos 1 al 5'
+      range: '1.° y 2.° Año',
+      nextTier: 'Intermedio',
+      nextTierLabel: 'NIVEL INTERMEDIO (3.° y 4.° Año)'
     },
     Intermedio: {
       badge: 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.3)]',
@@ -53,7 +61,9 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
       dotPast: 'bg-amber-950 border border-amber-400/80 text-amber-300',
       dotInactive: 'bg-slate-800 text-slate-500 border border-slate-700',
       label: 'INTERMEDIO',
-      range: 'Retos 6 al 10'
+      range: '3.° y 4.° Año',
+      nextTier: 'Experto',
+      nextTierLabel: 'NIVEL EXPERTO (5.° Año)'
     },
     Experto: {
       badge: 'bg-fuchsia-500/20 border-fuchsia-400 text-fuchsia-300 shadow-[0_0_12px_rgba(232,121,249,0.3)]',
@@ -61,7 +71,9 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
       dotPast: 'bg-fuchsia-950 border border-fuchsia-400/80 text-fuchsia-300',
       dotInactive: 'bg-slate-800 text-slate-500 border border-slate-700',
       label: 'EXPERTO',
-      range: 'Retos 11 al 15'
+      range: '5.° Año',
+      nextTier: null,
+      nextTierLabel: null
     }
   }[complexity];
 
@@ -75,7 +87,7 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
     setAutoAdvanceSeconds(4);
   }, [challenge.id]);
 
-  // Options are pre-alternated across challenges so the correct answer rotates across A, B, C, D.
+  // Options are alternated across challenges so the correct answer rotates across A, B, C, D.
   // We keep displayOptions memoized per challenge so positions remain stable during retries.
   const displayOptions = useMemo(() => {
     return [...challenge.options];
@@ -83,9 +95,10 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
 
   const OPTION_LETTERS = ['A', 'B', 'C', 'D'];
 
-  // Auto-advance countdown when challenge is successfully completed
+  // Auto-advance countdown ONLY for questions 1 to 4 within the same level.
+  // When question 5 is reached (isTierLast), auto-advance is STRICTLY DISABLED to prevent unwanted continuity!
   useEffect(() => {
-    if (!isSuccess) return;
+    if (!isSuccess || isTierLast) return;
 
     const interval = setInterval(() => {
       setAutoAdvanceSeconds((prev) => {
@@ -99,7 +112,7 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isSuccess, onNextChallenge]);
+  }, [isSuccess, isTierLast, onNextChallenge]);
 
   const handleSelectOption = (option: CifraOption) => {
     setSelectedOptionId(option.id);
@@ -120,8 +133,12 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
       const newTotal = currentBalance + chosen.points_delta;
       setAccumulatedSum(newTotal);
 
-      // Trigger user requested narration: "game over fin de este reto vamos al siguiente"
-      cyberAudio.narrateChallengeCompleted(challenge.id, isLastChallenge, chosen.points_delta, newTotal);
+      // Trigger narration: on question 5 of 5, celebrate level completion
+      if (isTierLast) {
+        cyberAudio.speak(`¡Nivel ${tierMeta.label} completado! Has superado las cinco preguntas del nivel.`);
+      } else {
+        cyberAudio.narrateChallengeCompleted(challenge.id, isLastChallenge, chosen.points_delta, newTotal);
+      }
 
       try {
         confetti({
@@ -143,9 +160,10 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
   };
 
   const handleRetryAfterError = () => {
-    // Reset selection so the user can re-read and try another option
     setSelectedOptionId(null);
     setHasSubmitted(false);
+    setLastFeedback('');
+    setIsSuccess(false);
     cyberAudio.playClick(750);
   };
 
@@ -164,7 +182,16 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
         {/* Top Badges & Logo Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-cyan-500/20 pb-3.5 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <CifraFlowLogo size="sm" variant="horizontal" showSubtitle={false} />
+            <CifraFlowLogo
+              size="sm"
+              variant="horizontal"
+              showSubtitle={false}
+              currentSpace="FASE_3_SIMULATION"
+              onClick={onLogoClick}
+              tooltipText="Clic para regresar a la Portada de Avatares"
+              onNavigateToSpace={onNavigateToSpace}
+              showSpaceMenu={true}
+            />
             <span
               className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider ${
                 isDeduccion
@@ -180,18 +207,19 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
               className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1.5 uppercase ${tierMeta.badge}`}
             >
               <span className="w-2 h-2 rounded-full animate-pulse bg-current" />
-              <span>Nivel {tierMeta.label} ({indexInTier}/5)</span>
+              <span>Nivel {tierMeta.label} • Pregunta {indexInTier}/5</span>
             </span>
 
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-              Reto {challenge.challengeIndexInModule} de 15 (# {challenge.id}/75)
+            {/* Venezuelan Bachillerato Year Tag */}
+            <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-950/80 text-cyan-200 border border-cyan-500/40">
+              🇻🇪 {challenge.bachilleratoYear || tierMeta.range}
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* 5-Step Complexity Level Indicator */}
             <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-950/80 border border-slate-800">
-              <span className="text-[10px] font-mono text-slate-400 uppercase mr-1">Progreso Nivel:</span>
+              <span className="text-[10px] font-mono text-slate-400 uppercase mr-1">Preguntas:</span>
               {[1, 2, 3, 4, 5].map((step) => {
                 const isCurrent = step === indexInTier;
                 const isPast = step < indexInTier;
@@ -205,7 +233,7 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
                         ? tierMeta.dotPast
                         : tierMeta.dotInactive
                     }`}
-                    title={`Reto ${step} de 5 del Nivel ${tierMeta.label}`}
+                    title={`Pregunta ${step} de 5 del Nivel ${tierMeta.label}`}
                   >
                     {isPast ? '✓' : step}
                   </div>
@@ -249,8 +277,9 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
 
         {/* 4 Multiple Choice Options */}
         <div className="space-y-2.5 mb-5">
-          {challenge.options.map((opt) => {
+          {displayOptions.map((opt, optIndex) => {
             const isSelected = selectedOptionId === opt.id;
+            const letter = OPTION_LETTERS[optIndex] || 'A';
 
             return (
               <button
@@ -273,13 +302,17 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
                         : 'bg-slate-800 text-slate-400 border border-slate-700'
                     }`}
                   >
-                    {String.fromCharCode(65 + opt.id)}
+                    {letter}
                   </span>
                   <span className="text-xs sm:text-sm leading-snug">{opt.text}</span>
                 </div>
 
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800 shrink-0">
-                  {opt.is_correct ? `+${opt.points_delta} pts` : `${opt.points_delta} pts`}
+                  {hasSubmitted && isSelected
+                    ? opt.is_correct
+                      ? `+${opt.points_delta} pts`
+                      : `${opt.points_delta} pts`
+                    : `Opción ${letter}`}
                 </span>
               </button>
             );
@@ -311,43 +344,62 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
                     <div>
                       <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
                         <span className="text-[10px] font-mono font-black uppercase tracking-widest text-emerald-400">
-                          {isLastChallenge ? '¡RETO FINAL COMPLETADO!' : '¡RETO SUPERADO CON ÉXITO!'}
+                          {isTierLast
+                            ? `¡NIVEL ${tierMeta.label} FINALIZADO! (5/5 PREGUNTAS)`
+                            : `¡PREGUNTA ${indexInTier}/5 SUPERADA CON ÉXITO!`}
                         </span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
-                          Avanzando al siguiente en {autoAdvanceSeconds}s...
-                        </span>
+                        {!isTierLast && (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                            Siguiente en {autoAdvanceSeconds}s...
+                          </span>
+                        )}
                       </div>
 
                       <h3 className="text-base sm:text-lg font-black font-mono text-white mb-2 tracking-wide">
-                        {isLastChallenge
-                          ? 'GAME OVER • FIN DE ESTE RETO • ¡TODOS LOS RETOS SUMADOS COMPLETOS!'
+                        {isTierLast
+                          ? `BLOQUE DE 5 PREGUNTAS DEL NIVEL ${tierMeta.label} COMPLETADO`
                           : 'GAME OVER • FIN DE ESTE RETO, VAMOS AL SIGUIENTE'}
                       </h3>
 
                       <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-950/80 rounded-xl p-2.5 border border-emerald-500/30 text-xs font-mono mb-2">
                         <span className="text-emerald-300 font-bold">
-                          Sumado en este reto: +{lastPointsDelta} pts
+                          Sumado en esta pregunta: +{lastPointsDelta} pts
                         </span>
                         <span className="text-cyan-300 font-bold">
                           Suma total acumulada: {accumulatedSum.toLocaleString()} pts
                         </span>
                       </div>
 
-                      {/* Auto advance progress bar */}
-                      <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden mb-2">
-                        <motion.div
-                          initial={{ width: '0%' }}
-                          animate={{ width: '100%' }}
-                          transition={{ duration: 4, ease: 'linear' }}
-                          className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400"
-                        />
-                      </div>
+                      {/* Auto advance progress bar ONLY for questions 1 to 4 */}
+                      {!isTierLast && (
+                        <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden mb-2">
+                          <motion.div
+                            initial={{ width: '0%' }}
+                            animate={{ width: '100%' }}
+                            transition={{ duration: 4, ease: 'linear' }}
+                            className="h-full bg-gradient-to-r from-emerald-400 to-cyan-400"
+                          />
+                        </div>
+                      )}
 
-                      {/* Tier completion celebration */}
-                      {isTierLast && !isLastChallenge && (
-                        <div className="mt-2.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-cyan-500/20 border border-emerald-400/50 text-emerald-200 text-xs font-mono font-bold flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
-                          <span>¡NIVEL {tierMeta.label} CONQUISTADO (5/5)! Desbloqueando siguiente nivel de complejidad...</span>
+                      {/* Level completion celebration banner (Question 5 of 5) - Strictly No Continuity */}
+                      {isTierLast && (
+                        <div className="mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/90 to-slate-950 border border-emerald-400/60 shadow-[0_0_20px_rgba(52,211,153,0.3)]">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Sparkles className="w-5 h-5 text-emerald-400 shrink-0" />
+                            <h4 className="text-xs sm:text-sm font-black font-mono uppercase text-emerald-300">
+                              ¡NIVEL {tierMeta.label} FINALIZADO (5/5 PREGUNTAS SUPERADAS)!
+                            </h4>
+                          </div>
+                          <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                            Has completado con éxito las 5 preguntas y respuestas del nivel correspondientes al programa de{' '}
+                            <strong>{challenge.bachilleratoYear || 'Bachillerato'}</strong>.
+                          </p>
+                          {challenge.bachilleratoFocus && (
+                            <p className="text-[11px] font-mono text-emerald-300/80 mt-1">
+                              📌 Foco programático: {challenge.bachilleratoFocus}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
@@ -391,7 +443,7 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
             </strong>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-3 w-full sm:w-auto flex-wrap sm:flex-nowrap justify-end">
             {/* If failed, show Retry button */}
             {hasSubmitted && !isSuccess && (
               <button
@@ -423,17 +475,49 @@ export const CifraChallengeModal: React.FC<CifraChallengeModalProps> = ({
               </button>
             )}
 
-            {/* If success: Advance to Next Challenge button */}
-            {isSuccess && (
+            {/* If success and within level (Questions 1 to 4): Advance to next question */}
+            {isSuccess && !isTierLast && (
               <button
                 id="next-challenge-btn"
                 type="button"
                 onClick={onNextChallenge}
                 className="w-full sm:w-auto px-8 py-3 rounded-xl bg-emerald-400 text-slate-950 font-black font-mono text-xs uppercase tracking-wider hover:bg-emerald-300 shadow-[0_0_25px_rgba(52,211,153,0.4)] flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
-                <span>VAMOS AL SIGUIENTE RETO</span>
+                <span>SIGUIENTE PREGUNTA ({indexInTier + 1}/5)</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
+            )}
+
+            {/* If success and level complete (Question 5 of 5): STRICTLY SEPARATE, NO CONTINUITY */}
+            {isSuccess && isTierLast && (
+              <div className="flex items-center gap-2.5 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                <button
+                  id="return-level-selector-btn"
+                  type="button"
+                  onClick={() => {
+                    if (onReturnToLevelSelector) {
+                      onReturnToLevelSelector();
+                    } else {
+                      onClose();
+                    }
+                  }}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                >
+                  <span>VOLVER A NIVELES</span>
+                </button>
+
+                {tierMeta.nextTierLabel && (
+                  <button
+                    id="next-tier-btn"
+                    type="button"
+                    onClick={onNextChallenge}
+                    className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-950 font-black font-mono text-xs uppercase tracking-wider hover:opacity-95 shadow-[0_0_25px_rgba(52,211,153,0.4)] flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <span>{tierMeta.nextTierLabel}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </div>

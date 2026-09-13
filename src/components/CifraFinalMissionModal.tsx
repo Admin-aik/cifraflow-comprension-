@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { Award, Sparkles, CheckCircle, RotateCcw, Printer, Share2, Shield, Star } from 'lucide-react';
 import { StudentProfile } from '../types';
 import { cyberAudio } from '../utils/audio';
-import { CifraFlowLogo } from './CifraFlowLogo';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface CifraFinalMissionModalProps {
   student: StudentProfile;
@@ -14,6 +14,8 @@ interface CifraFinalMissionModalProps {
   totalCompletedChallenges: number;
   onRestartAll: () => void;
   onClose: () => void;
+  onLogoClick?: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const CifraFinalMissionModal: React.FC<CifraFinalMissionModalProps> = ({
@@ -23,7 +25,9 @@ export const CifraFinalMissionModal: React.FC<CifraFinalMissionModalProps> = ({
   totalScore,
   totalCompletedChallenges,
   onRestartAll,
-  onClose
+  onClose,
+  onLogoClick,
+  onNavigateToSpace
 }) => {
   useEffect(() => {
     cyberAudio.narrateMissionAccomplished(totalScore);
@@ -77,7 +81,16 @@ export const CifraFinalMissionModal: React.FC<CifraFinalMissionModalProps> = ({
       >
         {/* Top Trophy Banner and Official Logo */}
         <div className="flex flex-col items-center mb-4">
-          <CifraFlowLogo size="md" variant="horizontal" className="mb-3" />
+          <CifraFlowLogo
+            size="md"
+            variant="horizontal"
+            className="mb-3"
+            currentSpace="FASE_3_SIMULATION"
+            onClick={onLogoClick}
+            tooltipText="Clic para regresar a la Portada de Avatares"
+            onNavigateToSpace={onNavigateToSpace}
+            showSpaceMenu={true}
+          />
           <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-1 flex items-center justify-center shadow-[0_0_35px_rgba(251,191,36,0.5)]">
             <div className="w-full h-full rounded-2xl bg-slate-950 flex items-center justify-center">
               <Award className="w-8 h-8 text-amber-400 animate-bounce" />

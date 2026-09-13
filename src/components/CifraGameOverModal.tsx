@@ -2,19 +2,24 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { AlertOctagon, RotateCcw, BookOpen, Layers, ShieldAlert } from 'lucide-react';
 import { cyberAudio } from '../utils/audio';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface CifraGameOverModalProps {
   finalBalance: number;
   onRestartWithSeedCapital: () => void;
   onReturnToModules: () => void;
   onOpenGlossary: () => void;
+  onLogoClick?: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const CifraGameOverModal: React.FC<CifraGameOverModalProps> = ({
   finalBalance,
   onRestartWithSeedCapital,
   onReturnToModules,
-  onOpenGlossary
+  onOpenGlossary,
+  onLogoClick,
+  onNavigateToSpace
 }) => {
   return (
     <div
@@ -31,6 +36,20 @@ export const CifraGameOverModal: React.FC<CifraGameOverModalProps> = ({
         transition={{ duration: 0.4 }}
         className="relative w-full max-w-lg rounded-3xl border-2 border-rose-500/70 bg-slate-900/95 p-6 sm:p-8 shadow-[0_0_60px_rgba(239,68,68,0.35)] ring-1 ring-rose-500/40 text-center font-sans"
       >
+        {/* Top Logo Navigation */}
+        <div className="flex justify-center mb-4">
+          <CifraFlowLogo
+            size="sm"
+            variant="horizontal"
+            showSubtitle={false}
+            currentSpace="FASE_3_SIMULATION"
+            onClick={onLogoClick}
+            tooltipText="Clic para regresar a la Portada de Avatares"
+            onNavigateToSpace={onNavigateToSpace}
+            showSpaceMenu={true}
+          />
+        </div>
+
         {/* Top Warning Icon */}
         <div className="mx-auto w-16 h-16 rounded-2xl bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center mb-4 shadow-[0_0_25px_rgba(239,68,68,0.5)]">
           <AlertOctagon className="w-8 h-8 text-rose-400" />

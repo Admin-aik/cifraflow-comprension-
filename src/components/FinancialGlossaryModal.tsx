@@ -1,9 +1,12 @@
 import React from 'react';
 import { BookOpen, X, Sparkles, Lightbulb } from 'lucide-react';
 import { cyberAudio } from '../utils/audio';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface FinancialGlossaryModalProps {
   onClose: () => void;
+  onLogoClick?: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 interface GlossaryEntry {
@@ -87,7 +90,11 @@ const CIFRA_GLOSSARY: GlossaryEntry[] = [
   }
 ];
 
-export const FinancialGlossaryModal: React.FC<FinancialGlossaryModalProps> = ({ onClose }) => {
+export const FinancialGlossaryModal: React.FC<FinancialGlossaryModalProps> = ({
+  onClose,
+  onLogoClick,
+  onNavigateToSpace
+}) => {
   return (
     <div
       id="financial-glossary-modal"
@@ -95,18 +102,31 @@ export const FinancialGlossaryModal: React.FC<FinancialGlossaryModalProps> = ({ 
     >
       <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-slate-950/95 backdrop-blur-2xl border-2 border-cyan-400/80 p-5 sm:p-7 shadow-[0_0_50px_rgba(0,243,255,0.35)]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-cyan-500/30 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-cyan-500/30 pb-4 gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/20 border border-cyan-400 shadow-[0_0_15px_#00f3ff]">
-              <BookOpen className="h-5 w-5 text-cyan-300" />
-            </div>
-            <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-cyan-400">
-                Compendio Táctico CifraFlow
-              </span>
-              <h2 className="text-lg sm:text-xl font-black text-white">
-                Glosario de Lógica, Inferencia & Matemáticas
-              </h2>
+            <CifraFlowLogo
+              size="sm"
+              variant="horizontal"
+              showSubtitle={false}
+              currentSpace="FASE_3_SIMULATION"
+              onClick={onLogoClick}
+              tooltipText="Clic para regresar a la Portada de Avatares"
+              onNavigateToSpace={onNavigateToSpace}
+              showSpaceMenu={true}
+            />
+            <div className="h-8 w-px bg-slate-800 hidden sm:block" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/20 border border-cyan-400 shadow-[0_0_15px_#00f3ff] shrink-0">
+                <BookOpen className="h-5 w-5 text-cyan-300" />
+              </div>
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-cyan-400">
+                  Compendio Táctico CifraFlow
+                </span>
+                <h2 className="text-lg sm:text-xl font-black text-white">
+                  Glosario de Lógica, Inferencia & Matemáticas
+                </h2>
+              </div>
             </div>
           </div>
           <button

@@ -2,6 +2,7 @@ import React from 'react';
 import { Layers, TrendingUp, TrendingDown, DollarSign, X, CheckCircle, FileText } from 'lucide-react';
 import { LedgerEntry } from '../types';
 import { cyberAudio } from '../utils/audio';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface FinancialLedgerModalProps {
   ledgerEntries: LedgerEntry[];
@@ -9,6 +10,8 @@ interface FinancialLedgerModalProps {
   totalRestasGastos: number;
   saldoDisponible: number;
   onClose: () => void;
+  onLogoClick?: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const FinancialLedgerModal: React.FC<FinancialLedgerModalProps> = ({
@@ -16,7 +19,9 @@ export const FinancialLedgerModal: React.FC<FinancialLedgerModalProps> = ({
   totalSumasIngresos,
   totalRestasGastos,
   saldoDisponible,
-  onClose
+  onClose,
+  onLogoClick,
+  onNavigateToSpace
 }) => {
   return (
     <div
@@ -26,18 +31,31 @@ export const FinancialLedgerModal: React.FC<FinancialLedgerModalProps> = ({
       <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl bg-slate-950/90 backdrop-blur-2xl border-2 border-fuchsia-500/70 p-5 sm:p-7 shadow-[0_0_50px_rgba(255,0,127,0.35)] ring-1 ring-cyan-500/40">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-fuchsia-500/30 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-fuchsia-500/30 pb-4 gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-fuchsia-500/20 border border-fuchsia-400 shadow-[0_0_15px_#ff007f]">
-              <Layers className="h-5 w-5 text-fuchsia-300" />
-            </div>
-            <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-widest text-fuchsia-400">
-                Bitácora Cognitiva Cyber-Space
-              </span>
-              <h2 className="text-lg sm:text-xl font-black text-white">
-                Registro de Razonamiento & Aciertos
-              </h2>
+            <CifraFlowLogo
+              size="sm"
+              variant="horizontal"
+              showSubtitle={false}
+              currentSpace="FASE_3_SIMULATION"
+              onClick={onLogoClick}
+              tooltipText="Clic para regresar a la Portada de Avatares"
+              onNavigateToSpace={onNavigateToSpace}
+              showSpaceMenu={true}
+            />
+            <div className="h-8 w-px bg-slate-800 hidden sm:block" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-fuchsia-500/20 border border-fuchsia-400 shadow-[0_0_15px_#ff007f] shrink-0">
+                <Layers className="h-5 w-5 text-fuchsia-300" />
+              </div>
+              <div>
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-fuchsia-400">
+                  Bitácora Cognitiva Cyber-Space
+                </span>
+                <h2 className="text-lg sm:text-xl font-black text-white">
+                  Registro de Razonamiento & Aciertos
+                </h2>
+              </div>
             </div>
           </div>
           <button

@@ -3,7 +3,7 @@ import { Sparkles, TrendingUp, DollarSign, Award, Volume2, VolumeX, BookOpen, La
 import { CIFRA_AVATARS } from '../data/avatars';
 import { StudentProfile } from '../types';
 import { cyberAudio } from '../utils/audio';
-import { CifraFlowLogo } from './CifraFlowLogo';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface FinancialHUDProps {
   student: StudentProfile | null;
@@ -20,6 +20,8 @@ interface FinancialHUDProps {
   onOpenGlossary: () => void;
   onOpenModules: () => void;
   onChangeAvatar: () => void;
+  onLogoClick?: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const FinancialHUD: React.FC<FinancialHUDProps> = ({
@@ -35,7 +37,9 @@ export const FinancialHUD: React.FC<FinancialHUDProps> = ({
   onOpenLedger,
   onOpenGlossary,
   onOpenModules,
-  onChangeAvatar
+  onChangeAvatar,
+  onLogoClick,
+  onNavigateToSpace
 }) => {
   const [showCalculator, setShowCalculator] = useState(false);
   const [calcInput, setCalcInput] = useState('24 * 5 + 10');
@@ -92,7 +96,16 @@ export const FinancialHUD: React.FC<FinancialHUDProps> = ({
             </div>
 
             <div>
-              <CifraFlowLogo size="sm" variant="horizontal" showSubtitle={false} />
+              <CifraFlowLogo
+                size="sm"
+                variant="horizontal"
+                showSubtitle={false}
+                currentSpace="FASE_3_SIMULATION"
+                onClick={onLogoClick || onChangeAvatar}
+                tooltipText="Clic para regresar a la Portada de Avatares"
+                onNavigateToSpace={onNavigateToSpace}
+                showSpaceMenu={true}
+              />
               <p className="text-[10px] font-mono text-cyan-400/90 flex items-center gap-1 mt-0.5">
                 <span>Avatar: <strong className="text-fuchsia-300">{currentAvatar.name}</strong></span>
                 <span className="text-slate-400 font-normal">(15-16 años)</span>

@@ -4,6 +4,7 @@ import { BookOpen, Calculator, Brain, Binary, Cpu, Play, CheckCircle, Award, Spa
 import { CIFRA_MODULES } from '../data/avatars';
 import { EducationalModule, StudentProfile } from '../types';
 import { cyberAudio } from '../utils/audio';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface CifraModuleSelectionProps {
   student: StudentProfile;
@@ -15,6 +16,8 @@ interface CifraModuleSelectionProps {
   onSelectModule: (moduleId: string, targetChallengeId?: number) => void;
   onStartAllChallenges: () => void;
   onChangeAvatar: () => void;
+  onLogoClick?: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
@@ -26,7 +29,9 @@ export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
   totalBalance,
   onSelectModule,
   onStartAllChallenges,
-  onChangeAvatar
+  onChangeAvatar,
+  onLogoClick,
+  onNavigateToSpace
 }) => {
   const getModuleIcon = (iconName: string, isEmprendimiento: boolean) => {
     const className = `w-6 h-6 ${isEmprendimiento ? 'text-emerald-300' : 'text-cyan-300'}`;
@@ -82,24 +87,38 @@ export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
       >
         {/* Top Header: Student Identity & Overall Balance */}
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-cyan-500/20 pb-5 mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 text-[10px] font-mono uppercase tracking-widest font-bold">
-                FASE 2: MÓDULOS DE ENTRENAMIENTO
-              </span>
-              <span className="text-xs text-slate-400 font-mono">
-                Estudiante: <strong className="text-slate-200">{student.fullName}</strong> ({student.nationalId})
-              </span>
-              <span className="text-xs text-slate-400 font-mono">
-                Institución: <strong className="text-slate-200">{student.schoolName}</strong>
-              </span>
+          <div className="flex items-start gap-4">
+            <CifraFlowLogo
+              size="md"
+              variant="horizontal"
+              showSubtitle={false}
+              currentSpace="FASE_2_MODULE_SELECT"
+              onClick={onLogoClick || onChangeAvatar}
+              tooltipText="Clic para regresar a la Portada de Avatares"
+              onNavigateToSpace={onNavigateToSpace}
+              showSpaceMenu={true}
+              className="mt-0.5"
+            />
+            <div className="h-10 w-px bg-slate-800 hidden sm:block" />
+            <div>
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 text-[10px] font-mono uppercase tracking-widest font-bold">
+                  FASE 2: MÓDULOS DE ENTRENAMIENTO
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  Estudiante: <strong className="text-slate-200">{student.fullName}</strong> ({student.nationalId})
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  Institución: <strong className="text-slate-200">{student.schoolName}</strong>
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-emerald-400">
+                Ecosistema CifraFlow: 75 Desafíos Tácticos
+              </h2>
+              <p className="text-xs text-slate-300 mt-0.5 font-sans">
+                Selecciona el módulo educativo para iniciar tu entrenamiento guiado por <strong>{avatarName}</strong>.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-white to-emerald-400">
-              Ecosistema CifraFlow: 75 Desafíos Tácticos
-            </h2>
-            <p className="text-xs text-slate-300 mt-0.5 font-sans">
-              Selecciona el módulo educativo para iniciar tu entrenamiento guiado por <strong>{avatarName}</strong>.
-            </p>
           </div>
 
           {/* Balance & Progress Box */}
@@ -137,21 +156,21 @@ export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-cyan-400" />
               <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-                Estructura por Módulo: 15 Retos divididos en 3 Niveles (5 por Nivel)
+                Programa de Bachillerato Venezolano: 3 Niveles Independientes (5 Preguntas c/u)
               </span>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-[11px] font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <strong>Principiante:</strong> Retos 1-5
+                <strong>Principiante:</strong> 1.° y 2.° Año (5 Preguntas)
               </span>
               <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-300 text-[11px] font-mono">
                 <span className="w-2 h-2 rounded-full bg-amber-400" />
-                <strong>Intermedio:</strong> Retos 6-10
+                <strong>Intermedio:</strong> 3.° y 4.° Año (5 Preguntas)
               </span>
               <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-fuchsia-500/15 border border-fuchsia-400/40 text-fuchsia-300 text-[11px] font-mono">
                 <span className="w-2 h-2 rounded-full bg-fuchsia-400" />
-                <strong>Experto:</strong> Retos 11-15
+                <strong>Experto:</strong> 5.° Año (5 Preguntas)
               </span>
             </div>
           </div>
@@ -239,21 +258,21 @@ export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
                   <div className="pt-2.5 border-t border-slate-800/80 mb-3">
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
-                        3 Niveles (5 Retos c/u):
+                        3 Niveles (5 Preguntas c/u):
                       </span>
                       <span className="text-[10px] font-mono text-cyan-300">
-                        Selecciona nivel directo
+                        Niveles independientes
                       </span>
                     </div>
 
                     <div className="grid grid-cols-3 gap-1.5">
-                      {/* Principiante (1-5) */}
+                      {/* Principiante (1°-2° Año, 5 Preguntas) */}
                       <button
                         type="button"
                         id={`btn-tier-principiante-${mod.id}`}
                         onClick={() => handleLevelClick(mod, 'Principiante', baseId + 1)}
                         className="p-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/40 hover:bg-emerald-900/60 text-left transition-all cursor-pointer group/tier"
-                        title={`Ir a Nivel Principiante: Retos ${baseId + 1} al ${baseId + 5}`}
+                        title={`Ir a Nivel Principiante (1.° y 2.° Año): 5 Preguntas (#${baseId + 1} a #${baseId + 5})`}
                       >
                         <div className="flex items-center justify-between mb-0.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -265,17 +284,17 @@ export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
                           Principiante
                         </div>
                         <div className="text-[9px] font-mono text-emerald-400/80 truncate">
-                          Retos 1-5
+                          1.°-2.° Año (5 P.)
                         </div>
                       </button>
 
-                      {/* Intermedio (6-10) */}
+                      {/* Intermedio (3°-4° Año, 5 Preguntas) */}
                       <button
                         type="button"
                         id={`btn-tier-intermedio-${mod.id}`}
                         onClick={() => handleLevelClick(mod, 'Intermedio', baseId + 6)}
                         className="p-1.5 rounded-xl border border-amber-500/40 bg-amber-950/40 hover:bg-amber-900/60 text-left transition-all cursor-pointer group/tier"
-                        title={`Ir a Nivel Intermedio: Retos ${baseId + 6} al ${baseId + 10}`}
+                        title={`Ir a Nivel Intermedio (3.° y 4.° Año): 5 Preguntas (#${baseId + 6} a #${baseId + 10})`}
                       >
                         <div className="flex items-center justify-between mb-0.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
@@ -287,17 +306,17 @@ export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
                           Intermedio
                         </div>
                         <div className="text-[9px] font-mono text-amber-400/80 truncate">
-                          Retos 6-10
+                          3.°-4.° Año (5 P.)
                         </div>
                       </button>
 
-                      {/* Experto (11-15) */}
+                      {/* Experto (5° Año, 5 Preguntas) */}
                       <button
                         type="button"
                         id={`btn-tier-experto-${mod.id}`}
                         onClick={() => handleLevelClick(mod, 'Experto', baseId + 11)}
                         className="p-1.5 rounded-xl border border-fuchsia-500/40 bg-fuchsia-950/40 hover:bg-fuchsia-900/60 text-left transition-all cursor-pointer group/tier"
-                        title={`Ir a Nivel Experto: Retos ${baseId + 11} al ${baseId + 15}`}
+                        title={`Ir a Nivel Experto (5.° Año): 5 Preguntas (#${baseId + 11} a #${baseId + 15})`}
                       >
                         <div className="flex items-center justify-between mb-0.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400" />
@@ -309,7 +328,7 @@ export const CifraModuleSelection: React.FC<CifraModuleSelectionProps> = ({
                           Experto
                         </div>
                         <div className="text-[9px] font-mono text-fuchsia-400/80 truncate">
-                          Retos 11-15
+                          5.° Año (5 P.)
                         </div>
                       </button>
                     </div>

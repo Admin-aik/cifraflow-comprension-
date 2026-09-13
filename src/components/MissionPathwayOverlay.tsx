@@ -112,9 +112,9 @@ export const MissionPathwayOverlay: React.FC<MissionPathwayOverlayProps> = ({
                   ? 'bg-emerald-400 text-slate-950 border-emerald-300 shadow-[0_0_10px_#34d399]'
                   : 'bg-emerald-950/50 text-emerald-300 border-emerald-500/30 hover:bg-emerald-900/60'
               }`}
-              title="Ir a Nivel Principiante (Retos 1 a 5 de este módulo)"
+              title="Ir a Nivel Principiante (1.° y 2.° Año de Bachillerato - 5 Preguntas)"
             >
-              🟢 Principiante (1-5)
+              🟢 Principiante (1.°-2.° Año)
             </button>
             <button
               type="button"
@@ -125,9 +125,9 @@ export const MissionPathwayOverlay: React.FC<MissionPathwayOverlayProps> = ({
                   ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-[0_0_10px_#fbbf24]'
                   : 'bg-amber-950/50 text-amber-300 border-amber-500/30 hover:bg-amber-900/60'
               }`}
-              title="Ir a Nivel Intermedio (Retos 6 a 10 de este módulo)"
+              title="Ir a Nivel Intermedio (3.° y 4.° Año de Bachillerato - 5 Preguntas)"
             >
-              🟡 Intermedio (6-10)
+              🟡 Intermedio (3.°-4.° Año)
             </button>
             <button
               type="button"
@@ -138,9 +138,9 @@ export const MissionPathwayOverlay: React.FC<MissionPathwayOverlayProps> = ({
                   ? 'bg-fuchsia-400 text-slate-950 border-fuchsia-300 shadow-[0_0_10px_#e879f9]'
                   : 'bg-fuchsia-950/50 text-fuchsia-300 border-fuchsia-500/30 hover:bg-fuchsia-900/60'
               }`}
-              title="Ir a Nivel Experto (Retos 11 a 15 de este módulo)"
+              title="Ir a Nivel Experto (5.° Año de Bachillerato - 5 Preguntas)"
             >
-              🟣 Experto (11-15)
+              🟣 Experto (5.° Año)
             </button>
           </div>
 

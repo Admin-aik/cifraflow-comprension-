@@ -4,7 +4,7 @@ import { Shield, Sparkles, Check, ArrowRight, UserCheck, Zap, Award } from 'luci
 import { CIFRA_AVATARS } from '../data/avatars';
 import { CifraAvatarProfile, StudentProfile } from '../types';
 import { cyberAudio } from '../utils/audio';
-import { CifraFlowLogo } from './CifraFlowLogo';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface CifraAvatarSelectionProps {
   student: StudentProfile;
@@ -12,6 +12,7 @@ interface CifraAvatarSelectionProps {
   onSelectAvatar: (avatarId: string) => void;
   onConfirmAvatar: () => void;
   onBackToLogin: () => void;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const CifraAvatarSelection: React.FC<CifraAvatarSelectionProps> = ({
@@ -19,7 +20,8 @@ export const CifraAvatarSelection: React.FC<CifraAvatarSelectionProps> = ({
   selectedAvatarId,
   onSelectAvatar,
   onConfirmAvatar,
-  onBackToLogin
+  onBackToLogin,
+  onNavigateToSpace
 }) => {
   const currentAvatar = CIFRA_AVATARS.find((a) => a.id === selectedAvatarId) || CIFRA_AVATARS[0];
 
@@ -46,7 +48,16 @@ export const CifraAvatarSelection: React.FC<CifraAvatarSelectionProps> = ({
         {/* Header Bar with Student Identity and Logo */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-cyan-500/20 pb-4 mb-6">
           <div className="flex items-center gap-3">
-            <CifraFlowLogo size="md" variant="horizontal" showSubtitle={false} />
+            <CifraFlowLogo
+              size="md"
+              variant="horizontal"
+              showSubtitle={false}
+              currentSpace="FASE_1_AVATAR"
+              onClick={onBackToLogin}
+              tooltipText="Clic para regresar a Inicio de Sesión (Logeo)"
+              onNavigateToSpace={onNavigateToSpace}
+              showSpaceMenu={true}
+            />
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 text-[10px] font-mono uppercase tracking-widest font-bold">

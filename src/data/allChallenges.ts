@@ -16,14 +16,44 @@ export interface ComplexityTierInfo {
   badgeBorder: string;
   badgeText: string;
   dotColor: string;
+  bachilleratoGrade: string;
   description: string;
+}
+
+export interface BachilleratoLevelInfo {
+  yearLabel: string;
+  gradeBadge: string;
+  pedagogicalFocus: string;
+}
+
+export function getBachilleratoGradeInfo(complexity: ChallengeComplexity): BachilleratoLevelInfo {
+  switch (complexity) {
+    case 'Principiante':
+      return {
+        yearLabel: '1.° y 2.° Año de Bachillerato (Educación Media General)',
+        gradeBadge: '1.° - 2.° Año',
+        pedagogicalFocus: 'Aritmética en Z y Q, regla de los signos, proporcionalidad, regla de tres, porcentajes y ecuaciones de 1er grado.'
+      };
+    case 'Intermedio':
+      return {
+        yearLabel: '3.° y 4.° Año de Bachillerato (Educación Media General)',
+        gradeBadge: '3.° - 4.° Año',
+        pedagogicalFocus: 'Polinomios, productos notables, ecuaciones cuadráticas, sistemas 2x2, teorema de Pitágoras y trigonometría básica.'
+      };
+    case 'Experto':
+      return {
+        yearLabel: '5.° Año de Bachillerato (Educación Media General)',
+        gradeBadge: '5.° Año',
+        pedagogicalFocus: 'Matrices, determinantes (Regla de Cramer), combinatoria, identidades trigonométricas avanzadas y optimización analítica.'
+      };
+  }
 }
 
 export const COMPLEXITY_TIERS: ComplexityTierInfo[] = [
   {
     tier: 'Principiante',
-    label: 'Nivel Principiante',
-    rangeText: 'Retos 1 al 5',
+    label: 'Nivel 1: Principiante',
+    rangeText: '5 Preguntas (1 al 5)',
     count: 5,
     minModuleIndex: 1,
     maxModuleIndex: 5,
@@ -31,12 +61,13 @@ export const COMPLEXITY_TIERS: ComplexityTierInfo[] = [
     badgeBorder: 'border-emerald-400',
     badgeText: 'text-emerald-300',
     dotColor: '#34d399',
-    description: 'Fundamentos de inferencia textual, operaciones aritméticas directas y premisas elementales.'
+    bachilleratoGrade: '1.° y 2.° Año',
+    description: 'Programa 1.° y 2.° Año EMG: Aritmética en Z y Q, proporciones, regla de tres simple, porcentajes y ecuaciones lineales.'
   },
   {
     tier: 'Intermedio',
-    label: 'Nivel Intermedio',
-    rangeText: 'Retos 6 al 10',
+    label: 'Nivel 2: Intermedio',
+    rangeText: '5 Preguntas (6 al 10)',
     count: 5,
     minModuleIndex: 6,
     maxModuleIndex: 10,
@@ -44,12 +75,13 @@ export const COMPLEXITY_TIERS: ComplexityTierInfo[] = [
     badgeBorder: 'border-amber-400',
     badgeText: 'text-amber-300',
     dotColor: '#fbbf24',
-    description: 'Deducción compuesta, proporciones, cuantificadores lógicos y filtrado de distractores.'
+    bachilleratoGrade: '3.° y 4.° Año',
+    description: 'Programa 3.° y 4.° Año EMG: Factorización de polinomios, ecuaciones de 2do grado, sistemas 2x2 y trigonometría básica.'
   },
   {
     tier: 'Experto',
-    label: 'Nivel Experto',
-    rangeText: 'Retos 11 al 15',
+    label: 'Nivel 3: Experto',
+    rangeText: '5 Preguntas (11 al 15)',
     count: 5,
     minModuleIndex: 11,
     maxModuleIndex: 15,
@@ -57,7 +89,8 @@ export const COMPLEXITY_TIERS: ComplexityTierInfo[] = [
     badgeBorder: 'border-fuchsia-400',
     badgeText: 'text-fuchsia-300',
     dotColor: '#e879f9',
-    description: 'Lógica silogística superior, análisis de variables complejas y demostración formal.'
+    bachilleratoGrade: '5.° Año',
+    description: 'Programa 5.° Año EMG: Matrices, determinantes de Cramer, combinatoria, identidades trigonométricas y optimización analítica.'
   }
 ];
 
@@ -122,11 +155,14 @@ export const ALL_CHALLENGES: CifraChallenge[] = RAW_CHALLENGES.map((challenge) =
   const complexity = getChallengeComplexity(challenge.challengeIndexInModule);
   const indexInComplexity = getIndexInComplexity(challenge.challengeIndexInModule);
   const alternatedOptions = alternateChallengeOptions(challenge.options, challenge.id);
+  const bachiInfo = getBachilleratoGradeInfo(complexity);
   return {
     ...challenge,
     options: alternatedOptions,
     complexity,
-    indexInComplexity
+    indexInComplexity,
+    bachilleratoYear: bachiInfo.yearLabel,
+    bachilleratoFocus: bachiInfo.pedagogicalFocus
   };
 });
 

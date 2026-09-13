@@ -4,20 +4,22 @@ import { Shield, Sparkles, User, School, FileText, ArrowRight, Volume2, VolumeX 
 import { StudentProfile } from '../types';
 import { cyberAudio } from '../utils/audio';
 import { CIFRAFLOW_BANNER_IMAGE, CIFRA_AVATARS } from '../data/avatars';
-import { CifraFlowLogo } from './CifraFlowLogo';
+import { CifraFlowLogo, CifraFlowSpace } from './CifraFlowLogo';
 
 interface CifraLoginScreenProps {
   onLoginSuccess: (student: StudentProfile) => void;
   soundEnabled: boolean;
   onToggleSound: () => void;
   bcvRate: number;
+  onNavigateToSpace?: (space: CifraFlowSpace) => void;
 }
 
 export const CifraLoginScreen: React.FC<CifraLoginScreenProps> = ({
   onLoginSuccess,
   soundEnabled,
   onToggleSound,
-  bcvRate
+  bcvRate,
+  onNavigateToSpace
 }) => {
   const [fullName, setFullName] = useState('');
   const [nationalId, setNationalId] = useState('');
@@ -83,7 +85,14 @@ export const CifraLoginScreen: React.FC<CifraLoginScreenProps> = ({
         {/* Top Sound & Engine Bar with Official CifraFlow Logo */}
         <div className="flex items-center justify-between border-b border-cyan-500/20 pb-4 mb-5">
           <div className="flex items-center gap-3">
-            <CifraFlowLogo size="sm" variant="horizontal" />
+            <CifraFlowLogo
+              size="sm"
+              variant="horizontal"
+              currentSpace="FASE_0_LOGIN"
+              tooltipText="Estás en la pantalla de inicio de sesión"
+              onNavigateToSpace={onNavigateToSpace}
+              showSpaceMenu={true}
+            />
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
               <Sparkles className="w-3.5 h-3.5" />
               <span>MATRIZ: <strong>75 RETOS EN SECUENCIA</strong></span>

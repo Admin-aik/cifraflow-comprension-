@@ -99,6 +99,43 @@ export default function App() {
     setCurrentPhase('FASE_1_AVATAR');
   };
 
+  // Unified Space Navigation
+  const handleNavigateToSpace = (space: CifraFlowPhase) => {
+    if (!student && space !== 'FASE_0_LOGIN') {
+      setStudent({
+        nationalId: 'V-30.123.456',
+        fullName: 'Estudiante CifraFlow',
+        schoolName: 'U.E. República de Venezuela'
+      });
+    }
+
+    // Always close open modals when switching spaces
+    setIsChallengeModalOpen(false);
+    setActiveSecondaryModal('none');
+
+    setCurrentPhase(space);
+    if (space === 'FASE_0_LOGIN') {
+      cyberAudio.speak('Regresando al inicio de sesión.');
+    } else if (space === 'FASE_1_AVATAR') {
+      cyberAudio.speak('Regresando a la portada de avatares.');
+    } else if (space === 'FASE_2_MODULE_SELECT') {
+      cyberAudio.speak('Abriendo módulos de entrenamiento.');
+    } else if (space === 'FASE_3_SIMULATION') {
+      cyberAudio.speak('Ingresando al cyber-space de simulación.');
+    }
+  };
+
+  // Dedicated Logo Click Behavior:
+  // - From Avatar Selection -> Returns to Login
+  // - From any other screen/modal -> Returns to Avatar Selection
+  const handleLogoClick = () => {
+    if (currentPhase === 'FASE_1_AVATAR') {
+      handleNavigateToSpace('FASE_0_LOGIN');
+    } else {
+      handleNavigateToSpace('FASE_1_AVATAR');
+    }
+  };
+
   // FASE 1 -> FASE 2
   const handleConfirmAvatar = () => {
     setCurrentPhase('FASE_2_MODULE_SELECT');
@@ -295,7 +332,9 @@ export default function App() {
           onOpenLedger={() => setActiveSecondaryModal('ledger')}
           onOpenGlossary={() => setActiveSecondaryModal('glossary')}
           onOpenModules={() => setCurrentPhase('FASE_2_MODULE_SELECT')}
-          onChangeAvatar={() => setCurrentPhase('FASE_1_AVATAR')}
+          onChangeAvatar={() => handleNavigateToSpace('FASE_1_AVATAR')}
+          onLogoClick={handleLogoClick}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
@@ -324,6 +363,7 @@ export default function App() {
           soundEnabled={soundEnabled}
           onToggleSound={handleToggleSound}
           bcvRate={bcvRate}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
@@ -334,7 +374,8 @@ export default function App() {
           selectedAvatarId={selectedAvatarId}
           onSelectAvatar={setSelectedAvatarId}
           onConfirmAvatar={handleConfirmAvatar}
-          onBackToLogin={() => setCurrentPhase('FASE_0_LOGIN')}
+          onBackToLogin={() => handleNavigateToSpace('FASE_0_LOGIN')}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
@@ -349,7 +390,9 @@ export default function App() {
           totalBalance={totalBalance}
           onSelectModule={handleSelectModule}
           onStartAllChallenges={handleStartAllChallenges}
-          onChangeAvatar={() => setCurrentPhase('FASE_1_AVATAR')}
+          onChangeAvatar={() => handleNavigateToSpace('FASE_1_AVATAR')}
+          onLogoClick={handleLogoClick}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
@@ -363,6 +406,9 @@ export default function App() {
           onNextChallenge={handleNextChallenge}
           onClose={() => setIsChallengeModalOpen(false)}
           onOpenGlossary={() => setActiveSecondaryModal('glossary')}
+          onReturnToLevelSelector={() => setCurrentPhase('FASE_2_MODULE_SELECT')}
+          onLogoClick={handleLogoClick}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
@@ -376,6 +422,8 @@ export default function App() {
             setCurrentPhase('FASE_2_MODULE_SELECT');
           }}
           onOpenGlossary={() => setActiveSecondaryModal('glossary')}
+          onLogoClick={handleLogoClick}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
@@ -389,6 +437,8 @@ export default function App() {
           totalCompletedChallenges={completedChallengeIds.length}
           onRestartAll={handleRestartAll}
           onClose={() => setCurrentPhase('FASE_2_MODULE_SELECT')}
+          onLogoClick={handleLogoClick}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
@@ -400,12 +450,18 @@ export default function App() {
           totalRestasGastos={totalGastos}
           saldoDisponible={totalBalance}
           onClose={() => setActiveSecondaryModal('none')}
+          onLogoClick={handleLogoClick}
+          onNavigateToSpace={handleNavigateToSpace}
         />
       )}
 
       {/* MODAL SECUNDARIO: GLOSARIO & FÓRMULAS FINANCIERAS */}
       {activeSecondaryModal === 'glossary' && (
-        <FinancialGlossaryModal onClose={() => setActiveSecondaryModal('none')} />
+        <FinancialGlossaryModal
+          onClose={() => setActiveSecondaryModal('none')}
+          onLogoClick={handleLogoClick}
+          onNavigateToSpace={handleNavigateToSpace}
+        />
       )}
     </div>
   );
